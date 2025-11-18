@@ -1,0 +1,34 @@
+name: Daily Auto Commit
+
+on:
+  schedule:
+    # Menjalankan workflow setiap jam, di menit ke-0.
+    - cron: '0 * * * *' 
+  workflow_dispatch: # Tombol untuk menjalankan manual di tab "Actions"
+
+jobs:
+  auto_commit_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Configure Git User
+        run: |
+          git config --global user.name "alip-jmbd"
+          git config --global user.email "alip.jmbd@users.noreply.github.com"
+      
+      - name: 3. Modify File
+        # Script ini menambahkan baris baru berisi tanggal ke file learning-log.txt
+        run: echo "Log entry pada $(date)" >> learning-log.txt
+
+      - name: 4. Commit and Push Changes
+        run: |
+          git add .
+          # Cek jika ada perubahan untuk di-commit
+          if ! git diff --staged --quiet; then
+            git commit -m "docs: Tambah catatan belajar harian"
+            git push
+          else
+            echo "Tidak ada perubahan untuk di-commit."
+          fi
